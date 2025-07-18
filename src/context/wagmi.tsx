@@ -1,10 +1,11 @@
 import '@rainbow-me/rainbowkit/styles.css';
 
 import {
+  darkTheme,
   getDefaultConfig,
   RainbowKitProvider,
 } from '@rainbow-me/rainbowkit';
-import { cookieStorage, createStorage, http, WagmiProvider } from 'wagmi';
+import { cookieStorage, cookieToInitialState, createStorage, http, WagmiProvider } from 'wagmi';
 import { monadTestnet } from 'wagmi/chains';
 import {
   QueryClientProvider,
@@ -37,11 +38,21 @@ const config = getDefaultConfig({
 
 const queryClient = new QueryClient();
 
-function WalletProvider({ children }: { children: React.ReactNode }) {
+function WalletProvider({ children, cookies }: { children: React.ReactNode; cookies?: string | null; }) {
+  const initialState = cookieToInitialState(
+    config,
+    cookies
+  );
+
   return (
-    <WagmiProvider config={config}>
+    <WagmiProvider config={config} initialState={initialState}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>
+        <RainbowKitProvider
+          locale="en-US"
+          initialChain={monadTestnet.id}
+          theme={darkTheme()}
+          modalSize="compact"
+        >
           {children}
         </RainbowKitProvider>
       </QueryClientProvider>
